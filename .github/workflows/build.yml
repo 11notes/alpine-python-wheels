@@ -60,6 +60,7 @@ jobs:
             const stringify = JSON.stringify(matrix);
             core.setOutput('stringify', stringify);
 
+
   # ╔═════════════════════════════════════════════════════╗
   # ║                                                     ║
   # ║                                                     ║
@@ -150,3 +151,40 @@ jobs:
           source-dir: ${{ runner.temp }}/whl
           destination-dir: ${{ env.WHEEL_PATH }}
           keep-file-fresh: true
+
+
+  # ╔═════════════════════════════════════════════════════╗
+  # ║                                                     ║
+  # ║                                                     ║
+  # ║                   DESIRED STATE                     ║
+  # ║                                                     ║
+  # ║                                                     ║
+  # ╚═════════════════════════════════════════════════════╝
+  desried-state:
+    runs-on: ubuntu-latest
+    steps:
+      # ╔═════════════════════════════════════════════════════╗
+      # ║         GITHUB REPOSITORY DEFAULT SETTINGS          ║
+      # ╚═════════════════════════════════════════════════════╝
+      # UPDATE REPO WITH DEFAULT SETTINGS
+      - name: github / update description and set repo defaults
+        run: |
+          curl --request PATCH \
+            --url https://api.github.com/repos/${{ github.repository }} \
+            --header 'authorization: Bearer ${{ secrets.REPOSITORY_TOKEN }}' \
+            --header 'content-type: application/json' \
+            --data '{
+              "homepage":"",
+              "has_issues":true,
+              "has_discussions":true,
+              "has_projects":false,
+              "has_wiki":false
+            }' \
+            --fail
+
+          curl --request PUT \
+            --url https://api.github.com/repos/${{ github.repository }}/actions/permissions/artifact-and-log-retention \
+            --header 'authorization: Bearer ${{ secrets.REPOSITORY_TOKEN }}' \
+            --header 'content-type: application/json' \
+            --data '{"days": 90}' \
+            --fail
