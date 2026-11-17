@@ -1,0 +1,57 @@
+name: update
+run-name: update ${{ inputs.wheel }} ${{ inputs.version }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      wheel:
+        description: 'name of wheel to use for build'
+        type: string
+        required: true
+
+      version:
+        description: 'version of wheel to build'
+        type: string
+        required: true
+
+      python:
+        description: 'list of python versions MAJOR.MINOR to build for'
+        type: string
+        required: false
+        default: "3.15,3.14,3.13"
+
+      platform:
+        description: 'list of platforms to build for'
+        type: string
+        required: false
+        default: "amd64,arm64,arm/v7"
+
+      force:
+        description: 'build regardless if version exists already'
+        type: string
+        required: false
+        default: "false"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: exists
+        run: |
+          if ! curl -sSL "https://wheels.11notes.dev/${{ inputs.wheel }}/" | grep -q "https://pub.11notes.dev/python/wheels/alpine/${{ inputs.wheel }}/${{ inputs.version }}/"; then
+            echo "EXISTS=false" >> "${GITHUB_ENV}"
+            echo "${{ inputs.wheel }}/${{ inputs.version }} does not exist"
+          fi
+
+          if [ "${{ inputs.force }}" = "true" ]; then
+            echo "EXISTS=false" >> "${GITHUB_ENV}"
+          fi
+
+      - name: call / build.yml
+        if: env.EXISTS == 'false'
+        uses: benc-uk/workflow-dispatch@d004979be141727c7a17c28f603e2facc40d0855 # v1.3.3
+        with:
+          wait-for-completion: false
+          workflow: build.yml
+          token: "${{ secrets.REPOSITORY_TOKEN }}"
+          inputs: '{ "wheel":"${{ inputs.wheel }}", "version":"${{ inputs.version }}", "python":"${{ inputs.python }}", "platform":"${{ inputs.platform }}" }'
