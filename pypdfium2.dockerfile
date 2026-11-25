@@ -16,7 +16,7 @@
 
   # add build requirements wheel specific
   RUN set -ex; \
-    export CHROMIUM_VERSION=$(curl -sSL https://api.github.com/repos/bblanchon/pdfium-binaries/releases/latest | jq -r '.tag_name' | sed 's/v//'); \
+    export CHROMIUM_VERSION=$(curl -fsSL --retry 3 https://api.github.com/repos/bblanchon/pdfium-binaries/releases/latest | jq -r '.tag_name' | sed 's/v//'); \
     case "${TARGETARCH}${TARGETVARIANT}" in \
       "arm64") eleven github asset bblanchon/pdfium-binaries ${CHROMIUM_VERSION} pdfium-linux-musl-arm64.tgz;; \
       "amd64") eleven github asset bblanchon/pdfium-binaries ${CHROMIUM_VERSION} pdfium-linux-musl-x64.tgz;; \
