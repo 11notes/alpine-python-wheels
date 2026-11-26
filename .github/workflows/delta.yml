@@ -32,7 +32,7 @@ jobs:
         id: audit
         run: |
           pip install packaging
-          python delta.py --python 3.15 3.14 3.13 --json --skip-pure > missing.json
+          python delta.py --python 3.15 3.14 --json --skip-pure > missing.json
           echo "count=$(jq length missing.json)" >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
