@@ -68,7 +68,8 @@ jobs:
               -f wheel="$project" \
               -f version="$version" \
               -f python="$python" \
-              -f platform="$arch" < /dev/null
+              -f platform="$arch" \
+              -f force="true" < /dev/null
 
             echo "- $project $version (python $python, $arch)" >> "$GITHUB_STEP_SUMMARY"
             sleep 5
